@@ -85,7 +85,7 @@ export default async function PreparePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <MobileNav />
           <div className="mr-4 hidden md:flex">
@@ -109,7 +109,7 @@ export default async function PreparePage() {
               const isCompleted = completedBadges.includes(module.badgeId)
               
               return (
-                <Card key={module.id} className={`${module.color} border-none`}>
+                <Card key={module.id} className={`${module.color} border-2 border-black shadow-lg`}>
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <Icon className="h-6 w-6 text-red-500" />
@@ -124,7 +124,7 @@ export default async function PreparePage() {
                       <Badge variant={isCompleted ? "default" : "secondary"} className="bg-red-500">
                         {isCompleted ? "Completed" : "Not Started"}
                       </Badge>
-                      <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
+                      <Button asChild className="bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1">
                         <Link href={`/prepare/${module.id}`}>
                           {isCompleted ? "Review" : "Start"}
                         </Link>
