@@ -5,8 +5,8 @@ import { ArrowLeft } from "lucide-react"
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-6 px-8 border-b">
-        <div className="container max-w-5xl flex items-center">
+      <header className="py-2 px-2 border-b">
+        <div className="container max-w-5xl flex items-center justify-between">
           <Link href="/" className="flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to home

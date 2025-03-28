@@ -53,13 +53,13 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom sage green colors
-        sage: {
-          100: "#e9eee0",
-          200: "#dae3cc",
-          300: "#c5d3b3",
-          400: "#b0c49a",
-          500: "#9bb581",
+        // Custom red colors
+        red: {
+          100: "#FFE5E3",
+          200: "#FFD1CD",
+          300: "#FFBDB7",
+          400: "#FFA9A1",
+          500: "#FF645C",
         },
       },
       borderRadius: {

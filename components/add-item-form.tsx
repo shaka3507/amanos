@@ -39,7 +39,7 @@ export function AddItemForm({ userId }: { userId: string }) {
         throw supabaseError
       }
 
-      router.push("/dashboard")
+      router.push("/")
       router.refresh()
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred")

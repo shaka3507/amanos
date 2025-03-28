@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
+import { AlertForm } from "@/components/alert/alert-form"
 
 export default async function CreateAlertPage() {
   let user = null
@@ -27,7 +28,7 @@ export default async function CreateAlertPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-6 px-8 border-b">
+      <header className="py-2 px-2 border-b">
         <div className="container max-w-5xl flex items-center justify-between">
           <Link href="/" className="flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -38,18 +39,15 @@ export default async function CreateAlertPage() {
       </header>
 
       <main className="flex-1 container max-w-5xl py-8 px-4">
-        <h1 className="text-3xl font-medium mb-8">Create an Alert</h1>
+        <h1 className="text-3xl font-medium mb-8">Create alert</h1>
 
-        <Card className="bg-sage-100 border-none mb-8">
+        <Card className="bg-red-100 border-none mb-8">
           <CardHeader>
-            <CardTitle>Set Up Your Alert</CardTitle>
+            <CardTitle>prepare to alert</CardTitle>
             <CardDescription>Configure notifications for important events</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">This feature is coming soon. Stay tuned for updates!</p>
-            <Button asChild className="bg-sage-400 hover:bg-sage-500 text-black">
-              <Link href="/">Return Home</Link>
-            </Button>
+            <AlertForm />
           </CardContent>
         </Card>
       </main>

@@ -62,10 +62,10 @@ export function NavBar({ user: initialUser }: { user: any }) {
           ) : (
             <>
               <Link href="/sign-in">
-                <Button variant="outline">Sign In</Button>
+                <Button variant="outline">Sign in</Button>
               </Link>
               <Link href="/sign-up">
-                <Button>Sign Up</Button>
+                <Button>Sign up</Button>
               </Link>
             </>
           )}

@@ -20,7 +20,7 @@ export default async function AddItemPage() {
     }
   } catch (error) {
     console.error("Error in AddItemPage:", error)
-    redirect("/dashboard")
+    redirect("/")
   }
 
   return (

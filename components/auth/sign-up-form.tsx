@@ -88,8 +88,8 @@ export function SignUpForm() {
           <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
-      <Button type="submit" className="w-full bg-sage-400 hover:bg-sage-500 text-black" disabled={loading}>
-        {loading ? "Creating account..." : "Sign Up"}
+      <Button type="submit" className="w-full bg-red-400 hover:bg-red-500 text-black" disabled={loading}>
+        {loading ? "Creating account..." : "Create Account"}
       </Button>
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Already have an account? </span>

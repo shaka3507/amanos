@@ -47,9 +47,8 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
   }
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: Grid },
-    { href: "/profile", label: "Profile", icon: User },
-    { href: "/settings", label: "Settings", icon: Settings },
+    { href: "/prepare", label: "Prepare", icon: Grid },
+    { href: "/contacts", label: "Contacts", icon: User },
   ]
 
   return (

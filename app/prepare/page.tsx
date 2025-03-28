@@ -27,7 +27,7 @@ export default async function PreparePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-6 px-8 border-b">
+      <header className="py-2 px-2 border-b">
         <div className="container max-w-5xl flex items-center justify-between">
           <Link href="/" className="flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -40,14 +40,14 @@ export default async function PreparePage() {
       <main className="flex-1 container max-w-5xl py-8 px-4">
         <h1 className="text-3xl font-medium mb-8">Prepare for the Future</h1>
 
-        <Card className="bg-sage-200 border-none mb-8">
+        <Card className="bg-red-200 border-none mb-8">
           <CardHeader>
-            <CardTitle>Plan Ahead</CardTitle>
+            <CardTitle>Plan ahead</CardTitle>
             <CardDescription>Set up your future planning and preparation</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="mb-4">This feature is coming soon. Stay tuned for updates!</p>
-            <Button asChild className="bg-sage-400 hover:bg-sage-500 text-black">
+            <Button asChild className="bg-red-400 hover:bg-red-500 text-black">
               <Link href="/">Return Home</Link>
             </Button>
           </CardContent>
