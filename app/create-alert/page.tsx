@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
 import { AlertForm } from "@/components/alert/alert-form"
+import { DashboardNav } from "@/components/dashboard-nav"
+import { MobileNav } from "@/components/mobile-nav"
 
 export default async function CreateAlertPage() {
   let user = null
@@ -28,20 +30,19 @@ export default async function CreateAlertPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-2 px-2 border-b">
-        <div className="container max-w-5xl flex items-center justify-between">
-          <Link href="/" className="flex items-center text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to home
-          </Link>
-          <h1 className="text-xl font-medium">amanos</h1>
+      <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <MobileNav />
+          <div className="mr-4 hidden md:flex">
+            <DashboardNav user={user} />
+          </div>
         </div>
       </header>
 
       <main className="flex-1 container max-w-5xl py-8 px-4">
         <h1 className="text-3xl font-medium mb-8">Create alert</h1>
 
-        <Card className="bg-red-100 border-none mb-8">
+        <Card className="bg-blue-100 border-2 border-black mb-8">
           <CardHeader>
             <CardTitle>prepare to alert</CardTitle>
             <CardDescription>Configure notifications for important events</CardDescription>

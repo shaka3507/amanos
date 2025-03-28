@@ -59,34 +59,36 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
             amanos
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center space-x-1 ${
-                    isActive ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
-          </nav>
+          <div className="flex-1 flex justify-end items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-6">
+              {navItems.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center space-x-1 ${
+                      isActive ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </nav>
 
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+            <Button
+              onClick={handleSignOut}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </div>
     </header>

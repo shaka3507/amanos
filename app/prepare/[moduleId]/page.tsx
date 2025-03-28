@@ -140,11 +140,11 @@ export default async function ModulePage({ params }: { params: { moduleId: strin
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <MobileNav />
           <div className="mr-4 hidden md:flex">
-            <DashboardNav />
+            <DashboardNav user={user} />
           </div>
         </div>
       </header>
@@ -163,7 +163,7 @@ export default async function ModulePage({ params }: { params: { moduleId: strin
             </div>
           </div>
 
-          <Card className={`${module.color} border-none mb-8`}>
+          <Card className={`${module.color} border-2 border-black mb-8`}>
             <CardHeader>
               <CardTitle>{module.title}</CardTitle>
               <CardDescription>{module.description}</CardDescription>
