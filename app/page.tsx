@@ -38,7 +38,7 @@ export default async function HomePage() {
               {/* Left panel - Create an alert */}
               <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8">
                 <div className="flex flex-col items-center justify-center text-center">
-                  <div className="h-16 w-16 rounded-full bg-blue-200 flex items-center justify-center mb-4">
+                  <div className="h-16 w-16 bg-blue-200 flex items-center justify-center mb-4">
                     <Bell className="h-8 w-8 text-red-500 flex-shrink-0" />
                   </div>
                   <h2 className="text-2xl font-medium">Create Alert</h2>
@@ -52,7 +52,7 @@ export default async function HomePage() {
               {/* Right panel - Prepare for future */}
               <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8">
                 <div className="flex flex-col items-center justify-center text-center">
-                  <div className="h-16 w-16 rounded-full bg-green-200 flex items-center justify-center mb-4">
+                  <div className="h-16 w-16 bg-green-200 flex items-center justify-center mb-4">
                     <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />
                   </div>
                   <h2 className="text-2xl font-medium">Prepare for Future</h2>
@@ -89,7 +89,7 @@ export default async function HomePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="bg-blue-100 border-2 border-black rounded-2xl p-8 mb-6">
+          <div className="bg-blue-100 border-2 border-black p-8 mb-6">
             <h2 className="text-2xl font-medium mb-4">welcome to amanos</h2>
             <p className="text-muted-foreground mb-6">emergency peace of mind, at your fingertips.</p>
             <Button asChild className="bg-blue-400 hover:bg-blue-500 text-black transform transition-transform hover:translate-x-1 hover:translate-y-1">

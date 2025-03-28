@@ -39,7 +39,7 @@ export function SignInForm() {
         return
       }
 
-      router.push("/prepare")
+      router.push("/")
       router.refresh()
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred")
@@ -79,7 +79,7 @@ export function SignInForm() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <Button type="submit" className="w-full bg-red-400 hover:bg-red-500 text-black" disabled={loading}>
+      <Button type="submit" className="w-full bg-blue-400 hover:bg-blue-500 text-black" disabled={loading}>
         {loading ? "Signing in..." : "Sign In"}
       </Button>
       <div className="text-center text-sm">

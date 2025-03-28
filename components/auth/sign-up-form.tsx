@@ -84,11 +84,11 @@ export function SignUpForm() {
         </Alert>
       )}
       {message && (
-        <Alert className="bg-sage-300 border-sage-400">
+        <Alert className="bg-red-300 border-red-400">
           <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
-      <Button type="submit" className="w-full bg-red-400 hover:bg-red-500 text-black" disabled={loading}>
+      <Button type="submit" className="w-full bg-green-400 hover:bg-green-500 text-black" disabled={loading}>
         {loading ? "Creating account..." : "Create Account"}
       </Button>
       <div className="text-center text-sm">

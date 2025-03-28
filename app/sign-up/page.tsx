@@ -19,7 +19,7 @@ export default function SignUpPage() {
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-medium mb-8 text-center">Sign up for amanos</h1>
-          <div className="bg-blue-100 border-2 border-black rounded-2xl p-8">
+          <div className="bg-blue-100 border-2 border-black p-8">
             <SignUpForm />
           </div>
         </div>

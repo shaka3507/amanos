@@ -19,7 +19,7 @@ export default function SignInPage() {
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-medium mb-8 text-center">Sign In to amanos</h1>
-          <div className="bg-blue-100 border-2 border-black rounded-2xl p-8">
+          <div className="bg-blue-100 border-2 border-black p-8">
             <SignInForm />
           </div>
         </div>

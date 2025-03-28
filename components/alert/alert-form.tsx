@@ -248,7 +248,7 @@ export function AlertForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full bg-red-400 hover:bg-red-500 text-black">
+      <Button type="submit" className="bg-red-400 hover:bg-red-500 text-black">
         Create Alert
       </Button>
     </form>

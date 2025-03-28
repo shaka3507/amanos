@@ -279,94 +279,89 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
 
   return (
     <>
-    <h1 className="text-3xl font-medium mb-8">Crisis Control</h1>
-    <div className="py-8">
-    {isAdmin && (
-      <form onSubmit={handleSendMessage} className="flex gap-2">
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-        />
-        <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">notify</Button>
-      </form>
-    )}
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-      {/* Left column - Items */}
-      <Card className="bg-red-100 border-none">
-        <CardHeader>
-          <CardTitle>Required Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between p-4 bg-white rounded-lg"
-              >
-                <div>
-                  <div className="font-medium">{item.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {item.description}
-                  </div>
-                  <div className="text-sm mt-1">
-                    Available: {item.quantity - item.claimed_quantity} / {item.quantity}
-                  </div>
-                </div>
-                {item.claimed_quantity < item.quantity && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleClaimItem(item.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white"
+    <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <h1 className="text-3xl font-medium mb-8">Crisis Control</h1>
+      </div>
+    </header>
+    <main className="flex-1">
+      <div className="container max-w-5xl py-8 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column - Items */}
+          <Card className="bg-red-100 border-2 border-black shadow-lg">
+            <CardHeader>
+              <CardTitle>Required Items</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-4 bg-white rounded-lg"
                   >
-                    Claim
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      {/* Right column - Messages */}
-      <Card className="bg-red-200 border-none">
-        <CardHeader>
-          <CardTitle>Group Notifications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="h-[400px] overflow-y-auto space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className="bg-white rounded-lg p-4 space-y-2"
-                >
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(message.created_at).toLocaleString()}
-                  </div>
-                  <div>{message.content}</div>
-                  <div className="flex gap-2">
-                    {Object.entries(message.reactions).map(([reaction, users]) => (
+                    <div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.description}
+                      </div>
+                      <div className="text-sm mt-1">
+                        Available: {item.quantity - item.claimed_quantity} / {item.quantity}
+                      </div>
+                    </div>
+                    {item.claimed_quantity < item.quantity && (
                       <Button
-                        key={reaction}
-                        variant={users.includes(userId) ? "default" : "outline"}
+                        variant="outline"
                         size="sm"
-                        onClick={() => handleReaction(message.id, reaction)}
-                        className={users.includes(userId) ? "bg-red-600 hover:bg-red-700 text-white" : "hover:bg-red-100"}
+                        onClick={() => handleClaimItem(item.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1"
                       >
-                        {reaction} ({users.length})
+                        Claim
                       </Button>
-                    ))}
+                    )}
                   </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          {/* Right column - Messages */}
+          <Card className="bg-red-200 border-2 border-black shadow-lg">
+            <CardHeader>
+              <CardTitle>Group Notifications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="h-[400px] overflow-y-auto space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className="bg-white rounded-lg p-4 space-y-2"
+                    >
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(message.created_at).toLocaleString()}
+                      </div>
+                      <div>{message.content}</div>
+                      <div className="flex gap-2">
+                        {Object.entries(message.reactions).map(([reaction, users]) => (
+                          <Button
+                            key={reaction}
+                            variant={users.includes(userId) ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handleReaction(message.id, reaction)}
+                            className={users.includes(userId) ? "bg-red-600 hover:bg-red-700 text-white" : "hover:bg-red-100"}
+                          >
+                            {reaction} ({users.length})
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </main>
     </>
   )
 } 
