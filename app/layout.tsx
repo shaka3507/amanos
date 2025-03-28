@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "amanos",
-  description: "A Next.js app with Supabase integration",
-    generator: 'v0.dev'
+  description: "an app for keeping us safe",
+    generator: 'v0.dev + cursor + person'
 }
 
 export default async function RootLayout({
