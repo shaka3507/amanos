@@ -47,22 +47,22 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
   }
 
   const navItems = [
-    { href: "/prepare", label: "Prepare", icon: Grid },
-    { href: "/contacts", label: "Contacts", icon: User },
+    { href: "/prepare", label: "Prepare" },
+    { href: "/contacts", label: "Contacts" },
   ]
 
   return (
     <header className="border-b py-4 px-8">
+    
       <div className="container max-w-5xl">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="font-medium text-xl">
-            amanos
-          </Link>
-
+      
+        <div className="flex items-center justify-between space-x-6">
+        <Link href="/" className="font-medium text-xl">
+        amanos
+      </Link>
           <div className="flex-1 flex justify-end items-center space-x-6">
             <nav className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => {
-                const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
                   <Link
@@ -72,7 +72,6 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
                       isActive ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
                   </Link>
                 )
@@ -85,7 +84,6 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
               size="sm"
               className="text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
           </div>
