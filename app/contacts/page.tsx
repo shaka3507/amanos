@@ -4,10 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ContactsForm } from "@/components/contacts-form"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { MobileNav } from "@/components/mobile-nav"
+import { User, Phone } from "lucide-react"
+import { ContactsList } from "@/components/contacts-list"
+
+interface Contact {
+  id: string
+  name: string
+  phone: string
+  email: string
+  relationship: string
+}
 
 export default async function ContactsPage() {
   let user = null
-  let contacts = null
+  let contacts: Contact[] | null = null
 
   try {
     const supabase = await createClient()
@@ -24,7 +34,14 @@ export default async function ContactsPage() {
         .select("*")
         .eq("user_id", user.id)
 
-      contacts = contactsData
+      // Ensure data conforms to Contact interface
+      contacts = contactsData ? contactsData.map((contact: any) => ({
+        id: contact.id,
+        name: contact.name,
+        phone: contact.phone,
+        email: contact.email || "",
+        relationship: contact.relationship || ""
+      })) : null
     } else {
       redirect("/sign-in")
     }
@@ -46,15 +63,38 @@ export default async function ContactsPage() {
       <main className="flex-1">
         <div className="container max-w-5xl py-8 px-4">
           <h1 className="text-3xl font-medium mb-8">Emergency Contacts</h1>
-          <Card className="max-w-2xl mx-auto bg-sage-100 border-none">
-            <CardHeader>
-              <CardTitle>Your Emergency Contacts</CardTitle>
-              <CardDescription>Add and manage your emergency contacts who will be notified when an alert is created</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {user && <ContactsForm user={user} contacts={contacts} />}
-            </CardContent>
-          </Card>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left column - Contact Form */}
+            <Card className="bg-blue-200 border-2 border-black shadow-lg">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-black">New Contact +</CardTitle>
+                </div>
+                <CardDescription className="text-black/80">
+                  These people will be notified when you create an alert
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-white border-t-2 border-black pt-6">
+                {user && <ContactsForm user={user} contacts={contacts} />}
+              </CardContent>
+            </Card>
+
+            {/* Right column - Contacts List */}
+            <Card className="bg-green-300 border-2 border-black shadow-lg">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-black">Contacts</CardTitle>
+                </div>
+                <CardDescription className="text-black/90">
+                  People who will be notified during emergencies
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-white border-t-2 border-black pt-6">
+                <ContactsList contacts={contacts} />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>

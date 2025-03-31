@@ -124,7 +124,7 @@ export default async function PreparePage() {
                       <Badge variant={isCompleted ? "default" : "secondary"} className="bg-red-500">
                         {isCompleted ? "Completed" : "Not Started"}
                       </Badge>
-                      <Button asChild className="bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1">
+                      <Button asChild className="bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 border-none rounded-none">
                         <Link href={`/prepare/${module.id}`}>
                           {isCompleted ? "Review" : "Start"}
                         </Link>

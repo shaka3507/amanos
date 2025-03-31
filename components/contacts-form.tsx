@@ -1,13 +1,14 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/utils/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Edit } from "lucide-react"
 
 interface Contact {
   id: string
@@ -25,7 +26,55 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [currentContactId, setCurrentContactId] = useState<string | null>(null)
   const router = useRouter()
+
+  // Listen for edit-contact events from the contacts list
+  useEffect(() => {
+    const handleEditContactEvent = (e: CustomEvent) => {
+      const { contactId } = e.detail;
+      const contact = contacts?.find(c => c.id === contactId);
+      if (contact) {
+        handleEditContact(contact);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('edit-contact', handleEditContactEvent as EventListener);
+
+    // Clean up event listener
+    return () => {
+      document.removeEventListener('edit-contact', handleEditContactEvent as EventListener);
+    };
+  }, [contacts]);
+
+  // Listen for delete-contact events from the contacts list
+  useEffect(() => {
+    const handleDeleteContactEvent = (e: CustomEvent) => {
+      const { contactId } = e.detail;
+      if (contactId) {
+        handleDelete(contactId);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('delete-contact', handleDeleteContactEvent as EventListener);
+
+    // Clean up event listener
+    return () => {
+      document.removeEventListener('delete-contact', handleDeleteContactEvent as EventListener);
+    };
+  }, []);
+
+  const resetForm = () => {
+    setName("")
+    setPhone("")
+    setEmail("")
+    setRelationship("")
+    setEditMode(false)
+    setCurrentContactId(null)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,24 +88,68 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
         throw new Error("Could not initialize Supabase client")
       }
 
-      const { error } = await supabase.from("emergency_contacts").insert({
+      // If in edit mode, update the existing contact
+      if (editMode && currentContactId) {
+        const { error } = await supabase
+          .from("emergency_contacts")
+          .update({
+            name,
+            phone,
+            email,
+            relationship,
+          })
+          .eq("id", currentContactId)
+          .eq("user_id", user.id)
+
+        if (error) {
+          setError(error.message)
+          return
+        }
+
+        setMessage("Contact updated successfully")
+        resetForm()
+        router.refresh()
+        return
+      }
+
+      // Otherwise, insert a new contact
+      const { error, data } = await supabase.from("emergency_contacts").insert({
         user_id: user.id,
         name,
         phone,
         email,
         relationship,
-      })
+      }).select()
 
       if (error) {
         setError(error.message)
         return
       }
 
+      // Send invitation email
+      try {
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: email,
+            name: name,
+          }),
+        })
+
+        if (!emailResponse.ok) {
+          console.warn('Failed to send invitation email:', await emailResponse.text())
+          // Continue despite email failure
+        }
+      } catch (emailError) {
+        console.error('Error sending invitation email:', emailError)
+        // Continue despite email failure
+      }
+
       setMessage("Contact added successfully")
-      setName("")
-      setPhone("")
-      setEmail("")
-      setRelationship("")
+      resetForm()
       router.refresh()
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred")
@@ -64,6 +157,26 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCancel = () => {
+    resetForm()
+    setMessage(null)
+    setError(null)
+  }
+
+  const handleEditContact = (contact: Contact) => {
+    setName(contact.name)
+    setPhone(contact.phone)
+    setEmail(contact.email)
+    setRelationship(contact.relationship)
+    setCurrentContactId(contact.id)
+    setEditMode(true)
+    setMessage(null)
+    setError(null)
+    
+    // Scroll to the form
+    document.querySelector('form')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   const handleDelete = async (contactId: string) => {
@@ -84,6 +197,12 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
       }
 
       setMessage("Contact deleted successfully")
+      
+      // If we're currently editing this contact, reset the form
+      if (currentContactId === contactId) {
+        resetForm()
+      }
+      
       router.refresh()
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred")
@@ -136,7 +255,6 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
             value={relationship}
             onChange={(e) => setRelationship(e.target.value)}
             placeholder="e.g., Family, Friend, Neighbor"
-            required
             className="bg-white"
           />
         </div>
@@ -150,39 +268,17 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
             <AlertDescription>{message}</AlertDescription>
           </Alert>
         )}
-        <Button type="submit" className="w-full bg-red-400 hover:bg-red-500 text-black" disabled={loading}>
-          {loading ? "Adding..." : "Add Contact"}
-        </Button>
-      </form>
-
-      {contacts && contacts.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-medium">Your Contacts</h2>
-          <div className="space-y-4">
-            {contacts.map((contact) => (
-              <div
-                key={contact.id}
-                className="bg-white p-4 flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-medium">{contact.name}</div>
-                  <div className="text-sm text-muted-foreground">{contact.relationship}</div>
-                  <div className="text-sm text-muted-foreground">{contact.phone}</div>
-                  <div className="text-sm text-muted-foreground">{contact.email}</div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(contact.id)}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                >
-                  Delete
-                </Button>
-              </div>
-            ))}
-          </div>
+        <div className="flex gap-2">
+          <Button type="submit" className={`flex-1 ${editMode ? 'bg-green-400 hover:bg-green-500' : 'bg-blue-400 hover:bg-blue-500'} text-black`} disabled={loading}>
+            {loading ? "Processing..." : editMode ? "Update Contact" : "Add Contact"}
+          </Button>
+          {editMode && (
+            <Button type="button" onClick={handleCancel} variant="outline" className="border-2 border-black">
+              Cancel
+            </Button>
+          )}
         </div>
-      )}
+      </form>
     </div>
   )
 } 
