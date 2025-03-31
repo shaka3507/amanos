@@ -297,7 +297,7 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg"
+                    className="flex items-center justify-between p-4 bg-white"
                   >
                     <div>
                       <div className="font-medium">{item.name}</div>
@@ -334,7 +334,7 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
                   {messages.map((message) => (
                     <div
                       key={message.id}
-                      className="bg-white rounded-lg p-4 space-y-2"
+                      className="bg-white p-4 space-y-2"
                     >
                       <div className="text-sm text-muted-foreground">
                         {new Date(message.created_at).toLocaleString()}

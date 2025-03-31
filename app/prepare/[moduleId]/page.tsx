@@ -171,7 +171,7 @@ export default async function ModulePage({ params }: { params: { moduleId: strin
             <CardContent>
               <div className="space-y-6">
                 {module.content.map((section, index) => (
-                  <div key={index} className="bg-white rounded-lg p-6">
+                  <div key={index} className="bg-white p-6">
                     <h3 className="text-xl font-medium mb-2">{section.title}</h3>
                     <p className="text-muted-foreground">{section.content}</p>
                   </div>

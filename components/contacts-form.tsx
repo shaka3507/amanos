@@ -162,7 +162,7 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
             {contacts.map((contact) => (
               <div
                 key={contact.id}
-                className="bg-white rounded-lg p-4 flex items-center justify-between"
+                className="bg-white p-4 flex items-center justify-between"
               >
                 <div>
                   <div className="font-medium">{contact.name}</div>

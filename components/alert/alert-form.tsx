@@ -203,7 +203,7 @@ export function AlertForm() {
             <Label>Required Items</Label>
             <div className="space-y-4">
               {defaultItems[weatherEvent as keyof typeof defaultItems]?.map((item) => (
-                <div key={item.name} className="flex items-center justify-between p-4 bg-white rounded-lg">
+                <div key={item.name} className="flex items-center justify-between p-4 bg-white">
                   <div className="flex items-center space-x-4">
                     <Checkbox
                       checked={!!selectedItems[item.name]}
