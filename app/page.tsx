@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Bell, Calendar } from "lucide-react"
+import { Bell, Calendar, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
 import { MobileNav } from "@/components/mobile-nav"
@@ -17,7 +17,8 @@ export default async function HomePage() {
       const { data: alertsData } = await supabase
         .from('alerts')
         .select('*')
-        .eq('archived', false)
+        .eq('status', 'active')
+        .eq('created_by', user?.id)
       alerts = alertsData || []
 
       console.log(alerts)
@@ -25,6 +26,35 @@ export default async function HomePage() {
   } catch (error) {
     console.error("Error in HomePage:", error)
   }
+
+  const formatTitle = (title: string) => {
+    // First replace underscores with spaces
+    let formattedTitle = title.replace(/_/g, ' ');
+    
+    // Remove the word "Alert" from the end of the string if present
+    formattedTitle = formattedTitle.replace(/\s*Alert$/i, '');
+    
+    return formattedTitle;
+  }
+
+  // Function to calculate and format duration since creation
+  const formatDuration = (createdAt: string) => {
+    const created = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (diffDays > 0) {
+      return `Ongoing for ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+    } else if (diffHours > 0) {
+      return `Ongoing for ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
+    } else {
+      return `Ongoing for ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+    }
+  };
 
   // If user is logged in, show the split screen with Create Alert and Prepare for Future
   if (user) {
@@ -44,12 +74,18 @@ export default async function HomePage() {
             {/* Display current alerts */}
             {alerts.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-medium mb-4">Current Alerts</h2>
+                <h2 className="text-2xl font-medium mb-4">Ongoing managed crises</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {alerts.map((alert: { id: string; title: string; description: string }) => (
-                    <div key={alert.id} className="bg-yellow-100 border-2 border-black p-4">
-                      <h3 className="text-xl font-semibold">{alert.title}</h3>
-                      <p className="text-muted-foreground mt-2">{alert.description}</p>
+                  {alerts.map((alert: { id: string; title: string; description: string; created_at: string }) => (
+                    <div key={alert.id} className="bg-[rgb(255,100,92)] border-2 border-black p-4 relative">
+                      <h3 className="text-xl font-semibold">{formatTitle(alert.title)}</h3>
+                      <p className="text-xs mt-2 font-medium">{formatDuration(alert.created_at).toLowerCase()}</p>
+                      <Link 
+                        href={`/alerts/${alert.id}`}
+                        className="absolute top-6 right-4 w-8 h-8 rounded-full flex items-center justify-center border-2 border-black hover:bg-gray-100 transition-colors"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Link>
                     </div>
                   ))}
                 </div>
