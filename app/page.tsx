@@ -7,12 +7,20 @@ import { DashboardNav } from "@/components/dashboard-nav"
 
 export default async function HomePage() {
   let user = null
+  let alerts = []
 
   try {
     const supabase = await createClient()
     if (supabase) {
       const { data } = await supabase.auth.getUser()
       user = data?.user
+      const { data: alertsData } = await supabase
+        .from('alerts')
+        .select('*')
+        .eq('archived', false)
+      alerts = alertsData || []
+
+      console.log(alerts)
     }
   } catch (error) {
     console.error("Error in HomePage:", error)
@@ -33,6 +41,21 @@ export default async function HomePage() {
 
         <main className="flex-1 flex flex-col">
           <div className="container max-w-5xl px-4 py-8 flex-1 flex flex-col">
+            {/* Display current alerts */}
+            {alerts.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-medium mb-4">Current Alerts</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {alerts.map((alert: { id: string; title: string; description: string }) => (
+                    <div key={alert.id} className="bg-yellow-100 border-2 border-black p-4">
+                      <h3 className="text-xl font-semibold">{alert.title}</h3>
+                      <p className="text-muted-foreground mt-2">{alert.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Split screen container */}
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
               {/* Left panel - Create an alert */}

@@ -4,24 +4,24 @@ import { supabaseUrl, supabaseAnonKey } from "@/app/env"
 
 export async function createClient() {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
 
     return createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
-        async get(name: string) {
-          const cookie = await cookieStore.get(name)
+        get(name: string) {
+          const cookie = cookieStore.get(name)
           return cookie?.value
         },
-        async set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: any) {
           try {
-            await cookieStore.set({ name, value, ...options })
+            cookieStore.set({ name, value, ...options })
           } catch (error) {
             console.error("Error setting cookie:", error)
           }
         },
-        async remove(name: string, options: any) {
+        remove(name: string, options: any) {
           try {
-            await cookieStore.set({ name, value: "", ...options })
+            cookieStore.set({ name, value: "", ...options })
           } catch (error) {
             console.error("Error removing cookie:", error)
           }
