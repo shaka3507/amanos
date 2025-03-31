@@ -3,6 +3,7 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import { createClient } from "@/utils/supabase/server"
 import { ThemeProvider } from "@/components/theme-provider"
+import ClientProviders from "@/components/client-providers"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -33,7 +34,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <div className="min-h-screen flex flex-col">{children}</div>
+          <ClientProviders>
+            <div className="min-h-screen flex flex-col">{children}</div>
+          </ClientProviders>
         </ThemeProvider>
       </body>
     </html>

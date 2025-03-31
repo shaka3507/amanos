@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
 import { MobileNav } from "@/components/mobile-nav"
 import { DashboardNav } from "@/components/dashboard-nav"
+import HomeLocationWrapper from "./home-location-wrapper"
+import { WeatherClient } from "@/components/weather-client"
 
 export default async function HomePage() {
   let user = null
@@ -71,10 +73,15 @@ export default async function HomePage() {
 
         <main className="flex-1 flex flex-col">
           <div className="container max-w-5xl px-4 py-8 flex-1 flex flex-col">
+            {/* Weather display */}
+            <div className="mb-6">
+              <WeatherClient />
+            </div>
+            
             {/* Display current alerts */}
             {alerts.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-medium mb-4">Ongoing managed crises</h2>
+              <div className="mb-8 m-1">
+                <h2 className="text-2xl font-medium mb-4">Ongoing crises</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {alerts.map((alert: { id: string; title: string; description: string; created_at: string }) => (
                     <div key={alert.id} className="bg-[rgb(255,100,92)] border-2 border-black p-4 relative">
@@ -95,7 +102,7 @@ export default async function HomePage() {
             {/* Split screen container */}
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
               {/* Left panel - Create an alert */}
-              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8">
+              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-1">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-blue-200 flex items-center justify-center mb-4">
                     <Bell className="h-8 w-8 text-red-500 flex-shrink-0" />
@@ -109,7 +116,7 @@ export default async function HomePage() {
               </div>
 
               {/* Right panel - Prepare for future */}
-              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8">
+              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-1">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-green-200 flex items-center justify-center mb-4">
                     <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />
@@ -130,6 +137,9 @@ export default async function HomePage() {
         <footer className="py-6 px-8 text-sm text-muted-foreground border-t">
           <p>© 2025 amanos. All rights reserved.</p>
         </footer>
+        
+        {/* Location modal */}
+        <HomeLocationWrapper />
       </div>
     )
   }
@@ -155,12 +165,20 @@ export default async function HomePage() {
               <Link href="/sign-up">Get Started</Link>
             </Button>
           </div>
+          
+          {/* Weather display */}
+          <div className="mt-6">
+            <WeatherClient />
+          </div>
         </div>
       </main>
 
       <footer className="py-6 px-8 text-sm text-muted-foreground border-t">
         <p>© 2025 amanos. All rights reserved.</p>
       </footer>
+      
+      {/* Location modal */}
+      <HomeLocationWrapper />
     </div>
   )
 }
