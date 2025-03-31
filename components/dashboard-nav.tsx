@@ -58,9 +58,9 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
       <div className="container max-w-5xl">
       
         <div className="flex items-center justify-between space-x-6">
-        <Link href="/" className="font-medium text-xl">
-        amanos
-      </Link>
+          <Link href="/" className="font-medium text-xl">
+            amanos
+          </Link>
           <div className="flex-1 flex justify-end items-center space-x-6">
             <nav className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => {
@@ -78,6 +78,13 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
                 )
               })}
             </nav>
+            
+            {user && user.email && (
+              <div className="text-sm text-muted-foreground hidden md:block">
+
+                {user.email}
+              </div>
+            )}
 
             <Button
               onClick={handleSignOut}

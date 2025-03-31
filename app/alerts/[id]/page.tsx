@@ -51,7 +51,7 @@ export default async function AlertPage({ params }: { params: { id: string } }) 
       <header className="sticky top-0 z-[100] w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between relative">
           <div className="flex items-center">
-            <MobileNav />
+            <MobileNav user={user} />
             <div className="mr-4 hidden md:flex">
               <DashboardNav user={user} />
             </div>

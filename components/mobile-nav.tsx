@@ -2,10 +2,10 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function MobileNav() {
+export function MobileNav({ user }: { user: any }) {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
@@ -48,19 +48,21 @@ export function MobileNav() {
               Contacts
             </Link>
             <Link 
-            href="/faq" 
-            className="text-lg font-medium hover:text-red-500 transition-colors w-full text-center"
-            onClick={() => setIsOpen(false)}
-          >
-            FAQ
-          </Link>
+              href="/faq" 
+              className="text-lg font-medium hover:text-red-500 transition-colors w-full text-center"
+              onClick={() => setIsOpen(false)}
+            >
+              FAQ
+            </Link>
+            
             <form action="/api/auth/signout" method="post" className="w-full">
               <Button 
                 variant="ghost" 
                 size="lg" 
                 className="w-full text-lg font-medium hover:text-red-500 transition-colors"
-              >
-                Sign out
+                >
+                sign out 
+                - {user && user.email}
               </Button>
             </form>
           </div>
