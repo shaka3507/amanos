@@ -90,6 +90,7 @@ export function AlertForm() {
   const [category, setCategory] = useState<string>("")
   const [weatherEvent, setWeatherEvent] = useState<string>("")
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>({})
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   const handleItemQuantityChange = (itemName: string, value: number) => {
@@ -101,6 +102,13 @@ export function AlertForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+
+    // Check if Supabase client is available
+    if (!supabase) {
+      setError("Unable to connect to the database. Please try again later.")
+      return
+    }
 
     try {
       // Get current user
@@ -158,9 +166,62 @@ export function AlertForm() {
 
       if (memberError) throw memberError
 
+      // Get user's emergency contacts
+      const { data: contacts, error: contactsError } = await supabase
+        .from('emergency_contacts')
+        .select('*')
+        .eq('created_by', user.id)
+
+      if (contactsError) {
+        console.error('Error fetching contacts:', contactsError)
+        // Continue even if there's an error with contacts
+      } else if (contacts && contacts.length > 0) {
+        // For each contact, add them to the group_alert_recipients table
+        const recipientInserts = contacts.map(contact => ({
+          alert_id: alertData.id,
+          user_id: contact.auth_user_id || null,
+          emergency_contact_id: contact.id,
+          notification_sent: false
+        }))
+
+        const { error: recipientsError } = await supabase
+          .from('group_alert_recipients')
+          .insert(recipientInserts)
+
+        if (recipientsError) {
+          console.error('Error adding alert recipients:', recipientsError)
+        } else {
+          // Send email notifications to all contacts
+          try {
+            for (const contact of contacts) {
+              await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  to: contact.email,
+                  name: contact.name,
+                  inviteType: 'alert',
+                  alertData: {
+                    title: `${weatherEvent.charAt(0).toUpperCase() + weatherEvent.slice(1)} Alert`,
+                    description: `Emergency alert for ${weatherEvent}`,
+                    alertId: alertData.id
+                  }
+                }),
+              })
+            }
+          } catch (emailError) {
+            console.error('Error sending alert emails:', emailError)
+            // Continue despite email errors
+          }
+        }
+      }
+
       router.push(`/alerts/${alertData.id}`)
     } catch (error) {
       console.error('Error creating alert:', error)
+      setError(error instanceof Error ? error.message : 'Failed to create alert. Please try again.')
     }
   }
 
@@ -247,6 +308,12 @@ export function AlertForm() {
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
 
       <Button type="submit" className="bg-red-400 hover:bg-red-500 text-black">
         Create Alert

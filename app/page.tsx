@@ -80,7 +80,7 @@ export default async function HomePage() {
             
             {/* Display current alerts */}
             {alerts.length > 0 && (
-              <div className="mb-8 m-1">
+              <div className="mb-8 ml-1">
                 <h2 className="text-2xl font-medium mb-4">Ongoing crises</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {alerts.map((alert: { id: string; title: string; description: string; created_at: string }) => (
@@ -102,7 +102,7 @@ export default async function HomePage() {
             {/* Split screen container */}
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
               {/* Left panel - Create an alert */}
-              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-1">
+              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-blue-200 flex items-center justify-center mb-4">
                     <Bell className="h-8 w-8 text-red-500 flex-shrink-0" />
@@ -116,7 +116,7 @@ export default async function HomePage() {
               </div>
 
               {/* Right panel - Prepare for future */}
-              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-1">
+              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-green-200 flex items-center justify-center mb-4">
                     <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />

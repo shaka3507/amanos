@@ -47,6 +47,13 @@ export function MobileNav() {
             >
               Contacts
             </Link>
+            <Link 
+            href="/faq" 
+            className="text-lg font-medium hover:text-red-500 transition-colors w-full text-center"
+            onClick={() => setIsOpen(false)}
+          >
+            FAQ
+          </Link>
             <form action="/api/auth/signout" method="post" className="w-full">
               <Button 
                 variant="ghost" 

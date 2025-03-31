@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Edit } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 
 interface Contact {
   id: string
@@ -28,6 +29,8 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
   const [message, setMessage] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [currentContactId, setCurrentContactId] = useState<string | null>(null)
+  const [createAccount, setCreateAccount] = useState(false)
+  const [inviteSent, setInviteSent] = useState(false)
   const router = useRouter()
 
   // Listen for edit-contact events from the contacts list
@@ -74,6 +77,8 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
     setRelationship("")
     setEditMode(false)
     setCurrentContactId(null)
+    setCreateAccount(false)
+    setInviteSent(false)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,6 +86,7 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
     setLoading(true)
     setError(null)
     setMessage(null)
+    setInviteSent(false)
 
     try {
       const supabase = createClient()
@@ -97,6 +103,7 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
             phone,
             email,
             relationship,
+            // Don't update created_by in edit mode
           })
           .eq("id", currentContactId)
           .eq("user_id", user.id)
@@ -112,13 +119,60 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
         return
       }
 
+      // Create user account if requested
+      let contactUserId = null
+      if (createAccount) {
+        // Check if user already exists
+        const { data: existingUserData, error: existingUserError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle()
+        
+        if (existingUserError && !existingUserError.message.includes('No rows found')) {
+          setError(existingUserError.message)
+          setLoading(false)
+          return
+        }
+        
+        if (existingUserData) {
+          // User already exists
+          contactUserId = existingUserData.id
+        } else {
+          // Generate a random password (user will reset via email)
+          const tempPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10)
+          
+          // Create new user
+          const { data: newUserData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password: tempPassword,
+            options: {
+              data: {
+                full_name: name,
+                phone: phone
+              }
+            }
+          })
+          
+          if (signUpError) {
+            // Handle error but continue - we'll still add them as a contact
+            console.error("Error creating user account:", signUpError)
+          } else if (newUserData?.user) {
+            contactUserId = newUserData.user.id
+            setInviteSent(true)
+          }
+        }
+      }
+
       // Otherwise, insert a new contact
       const { error, data } = await supabase.from("emergency_contacts").insert({
         user_id: user.id,
+        created_by: user.id, // Add the created_by field
         name,
         phone,
         email,
         relationship,
+        auth_user_id: contactUserId // Link to auth user if created
       }).select()
 
       if (error) {
@@ -136,6 +190,7 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
           body: JSON.stringify({
             to: email,
             name: name,
+            inviteType: createAccount ? 'account' : 'contact'
           }),
         })
 
@@ -148,7 +203,8 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
         // Continue despite email failure
       }
 
-      setMessage("Contact added successfully")
+      const accountMsg = inviteSent ? " and user account created" : ""
+      setMessage(`Contact added successfully${accountMsg}`)
       resetForm()
       router.refresh()
     } catch (err: any) {
@@ -258,6 +314,26 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
             className="bg-white"
           />
         </div>
+        
+        {!editMode && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="create-account"
+              checked={createAccount}
+              onCheckedChange={setCreateAccount}
+            />
+            <Label htmlFor="create-account" className="cursor-pointer">
+              Create user account for this contact
+            </Label>
+          </div>
+        )}
+        
+        {createAccount && !editMode && (
+          <div className="bg-blue-50 p-3 rounded-md text-sm">
+            An invitation will be sent to {email} to set up their Amanos account.
+          </div>
+        )}
+        
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>

@@ -49,6 +49,7 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
   const navItems = [
     { href: "/prepare", label: "Prepare" },
     { href: "/contacts", label: "Contacts" },
+    { href: "/faq", label: "FAQ" },
   ]
 
   return (
