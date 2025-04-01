@@ -113,28 +113,6 @@ export default async function HomePage() {
 
             {/* Split screen container */}
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
-              {/* Left panel - Alert Information */}
-              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <div className="h-16 w-16 bg-blue-200 flex items-center justify-center mb-4">
-                    <ShieldAlert className="h-8 w-8 text-red-500 flex-shrink-0" />
-                  </div>
-                  <h2 className="text-2xl font-medium">Alert System</h2>
-                  <p className="text-muted-foreground mt-2">
-                    Alerts can only be created by administrators
-                  </p>
-                  {isAdmin && (
-                    <Button asChild className="bg-blue-300 hover:bg-blue-400 text-black mt-6 transform transition-transform hover:translate-x-1 hover:translate-y-1">
-                      <Link href="/admin/alerts/create">Create Alert</Link>
-                    </Button>
-                  )}
-                  {!isAdmin && (
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Contact an administrator if you need to create an alert
-                    </p>
-                  )}
-                </div>
-              </div>
 
               {/* Right panel - Prepare for future */}
               <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">

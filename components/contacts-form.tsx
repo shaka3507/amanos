@@ -19,7 +19,7 @@ interface Contact {
   relationship: string
 }
 
-export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[] | null }) {
+export function ContactsForm({ user, contacts, maxContacts = 1 }: { user: any; contacts: Contact[] | null; maxContacts?: number }) {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
@@ -32,6 +32,9 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
   const [createAccount, setCreateAccount] = useState(false)
   const [inviteSent, setInviteSent] = useState(false)
   const router = useRouter()
+
+  // Calculate if contact limit is reached
+  const isLimitReached = contacts && contacts.length >= maxContacts
 
   // Listen for edit-contact events from the contacts list
   useEffect(() => {
@@ -92,6 +95,11 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
       const supabase = createClient()
       if (!supabase) {
         throw new Error("Could not initialize Supabase client")
+      }
+
+      // Check if in edit mode or if contact limit is reached
+      if (!editMode && isLimitReached) {
+        throw new Error(`You can only have ${maxContacts} emergency contact${maxContacts === 1 ? '' : 's'}`)
       }
 
       // If in edit mode, update the existing contact
@@ -269,91 +277,105 @@ export function ContactsForm({ user, contacts }: { user: any; contacts: Contact[
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Contact's full name"
-            required
-            className="bg-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Contact's phone number"
-            required
-            className="bg-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Contact's email address"
-            required
-            className="bg-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="relationship">Relationship</Label>
-          <Input
-            id="relationship"
-            value={relationship}
-            onChange={(e) => setRelationship(e.target.value)}
-            placeholder="e.g., Family, Friend, Neighbor"
-            className="bg-white"
-          />
-        </div>
-        
-        {!editMode && (
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="create-account"
-              checked={createAccount}
-              onCheckedChange={setCreateAccount}
-            />
-            <Label htmlFor="create-account" className="cursor-pointer">
-              Create user account for this contact
-            </Label>
-          </div>
-        )}
-        
-        {createAccount && !editMode && (
-          <div className="bg-blue-50 p-3 rounded-md text-sm">
-            An invitation will be sent to {email} to set up their Amanos account.
-          </div>
-        )}
-        
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
         {message && (
-          <Alert>
+          <Alert className="mb-4 bg-green-100 text-green-800 border border-green-200">
             <AlertDescription>{message}</AlertDescription>
           </Alert>
         )}
-        <div className="flex gap-2">
-          <Button type="submit" className={`flex-1 ${editMode ? 'bg-green-400 hover:bg-green-500' : 'bg-blue-400 hover:bg-blue-500'} text-black`} disabled={loading}>
-            {loading ? "Processing..." : editMode ? "Update Contact" : "Add Contact"}
-          </Button>
-          {editMode && (
-            <Button type="button" onClick={handleCancel} variant="outline" className="border-2 border-black">
-              Cancel
-            </Button>
-          )}
-        </div>
+        {error && (
+          <Alert className="mb-4 bg-red-100 text-red-800 border border-red-200">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {!editMode && isLimitReached ? (
+          <div className="p-4 border border-gray-200 rounded-md bg-gray-50 text-center">
+            <p className="text-muted-foreground mb-2">
+              You've reached the maximum number of emergency contacts ({maxContacts}).
+            </p>
+            <p className="text-sm">
+              Edit or delete an existing contact from below.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Contact's full name"
+                required
+                className="bg-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Contact's phone number"
+                required
+                className="bg-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Contact's email address"
+                required
+                className="bg-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="relationship">Relationship</Label>
+              <Input
+                id="relationship"
+                value={relationship}
+                onChange={(e) => setRelationship(e.target.value)}
+                placeholder="e.g., Family, Friend, Neighbor"
+                className="bg-white"
+              />
+            </div>
+            
+            {!editMode && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="create-account"
+                  checked={createAccount}
+                  onCheckedChange={setCreateAccount}
+                />
+                <Label htmlFor="create-account" className="cursor-pointer">
+                  Create user account for this contact
+                </Label>
+              </div>
+            )}
+            
+            {createAccount && !editMode && (
+              <div className="bg-blue-50 p-3 rounded-md text-sm">
+                An invitation will be sent to {email} to set up their Amanos account.
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <Button type="submit" className={`flex-1 ${editMode ? 'bg-green-400 hover:bg-green-500' : 'bg-blue-400 hover:bg-blue-500'} text-black`} disabled={loading}>
+                {loading ? "Processing..." : editMode ? "Update Contact" : "Add Contact"}
+              </Button>
+              {editMode && (
+                <Button type="button" onClick={handleCancel} variant="outline" className="border-2 border-black">
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </>
+        )}
       </form>
     </div>
   )

@@ -6,6 +6,7 @@ import { DashboardNav } from "@/components/dashboard-nav"
 import { MobileNav } from "@/components/mobile-nav"
 import { User, Phone } from "lucide-react"
 import { ContactsList } from "@/components/contacts-list"
+import { ProfileForm } from "@/components/profile-form"
 
 interface Contact {
   id: string
@@ -15,9 +16,23 @@ interface Contact {
   relationship: string
 }
 
+interface Profile {
+  id: string
+  full_name?: string
+  email?: string
+  phone?: string
+  address?: string
+  city?: string
+  state?: string
+  zip?: string
+  role?: string
+}
+
 export default async function ContactsPage() {
   let user = null
   let contacts: Contact[] | null = null
+  let profile: Profile | null = null
+  let isAdmin = false
 
   try {
     const supabase = await createClient()
@@ -29,10 +44,22 @@ export default async function ContactsPage() {
         redirect("/sign-in")
       }
 
+      // Get user profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+      
+      profile = profileData
+      isAdmin = profile?.role === 'admin'
+
+      // Get emergency contacts
       const { data: contactsData } = await supabase
         .from("emergency_contacts")
         .select("*")
         .eq("user_id", user.id)
+        .order('created_at', { ascending: false })
 
       // Ensure data conforms to Contact interface
       contacts = contactsData ? contactsData.map((contact: any) => ({
@@ -62,39 +89,66 @@ export default async function ContactsPage() {
       </header>
       <main className="flex-1">
         <div className="container max-w-5xl py-8 px-4">
-          <h1 className="text-3xl font-medium mb-8">Emergency Contacts</h1>
+          <h1 className="text-3xl font-medium mb-8">My Contact Information</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left column - Contact Form */}
-            <Card className="bg-blue-200 border-2 border-black shadow-lg">
+            {/* Left column - User Profile Form */}
+            <Card className="bg-yellow-200 border-2 border-black shadow-lg">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <CardTitle className="text-black">New Contact +</CardTitle>
+                  <User className="h-5 w-5" />
+                  <CardTitle className="text-black">My Information</CardTitle>
                 </div>
                 <CardDescription className="text-black/80">
-                  These people will be notified when you create an alert
+                  Update your personal contact information
                 </CardDescription>
               </CardHeader>
               <CardContent className="bg-white border-t-2 border-black pt-6">
-                {user && <ContactsForm user={user} contacts={contacts} />}
+                {user && profile && <ProfileForm user={user} profile={profile} />}
               </CardContent>
             </Card>
 
-            {/* Right column - Contacts List */}
-            <Card className="border-2 border-black shadow-lg">
+            {/* Right column - Emergency Contact Form */}
+            <Card className="bg-blue-200 border-2 border-black shadow-lg">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Phone className="h-5 w-5" />
+                  <CardTitle className="text-black">Emergency Contact</CardTitle>
+                </div>
+                <CardDescription className="text-black/80">
+                  This person will be notified when you create an alert
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-white border-t-2 border-black pt-6">
+                {user && <ContactsForm 
+                  user={user} 
+                  contacts={contacts} 
+                  maxContacts={isAdmin ? 5 : 1} 
+                />}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* If user has contacts, show them */}
+          {contacts && contacts.length > 0 && (
+            <Card className="border-2 border-black shadow-lg mt-8">
               <CardHeader className="bg-green-300">
                 <div className="flex items-center gap-3">
-                  <CardTitle className="text-black">Contacts</CardTitle>
+                  <CardTitle className="text-black">
+                    {isAdmin ? 'My Emergency Contacts' : 'My Emergency Contact'}
+                  </CardTitle>
                 </div>
                 <CardDescription className="text-black/90">
-                  People who will be notified during emergencies
+                  {isAdmin 
+                    ? 'People who will be notified during emergencies' 
+                    : 'Person who will be notified during emergencies'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="bg-white border-t-2 border-black pt-6">
                 <ContactsList contacts={contacts} />
               </CardContent>
             </Card>
-          </div>
+          )}
         </div>
       </main>
     </div>

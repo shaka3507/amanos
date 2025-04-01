@@ -36,7 +36,7 @@ export default async function AdminDashboardPage() {
 
   const adminMenuItems = [
     {
-      title: "User Management",
+      title: "Contact Management",
       description: "Manage users and permissions",
       icon: Users,
       link: "/admin/users",
@@ -48,6 +48,12 @@ export default async function AdminDashboardPage() {
       icon: AlertTriangle,
       link: "/admin/alerts",
       count: alertCount
+    },
+    {
+      title: "Prep Check",
+      description: "Update prepartion checklists",
+      icon: Settings,
+      link: "/admin/prepartion"
     },
     {
       title: "System Settings",

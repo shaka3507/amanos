@@ -72,12 +72,11 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
   const navItems = [
     { href: "/prepare", label: "Prepare" },
     { href: "/contacts", label: "Contacts" },
-    { href: "/faq", label: "FAQ" },
   ]
 
   // Add the admin item if user is an admin
   if (isAdmin) {
-    navItems.push({ href: "/admin", label: "Admin", icon: Shield })
+    navItems.push({ href: "/admin", label: "Admin" })
   }
 
   return (

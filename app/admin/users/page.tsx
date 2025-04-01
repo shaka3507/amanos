@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { MobileNav } from "@/components/mobile-nav"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, User, Shield } from "lucide-react"
+import { ArrowLeft, User, Shield, Phone, MapPin } from "lucide-react"
 
 export default async function AdminUsersPage() {
   let user = null
@@ -40,20 +40,30 @@ export default async function AdminUsersPage() {
 
       <main className="flex-1">
         <div className="container max-w-5xl py-8 px-4">
-          <div className="flex items-center mb-8">
-            <Link href="/admin" className="mr-4">
-              <Button variant="outline" size="icon">
-                <ArrowLeft className="h-4 w-4" />
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <Link href="/admin" className="mr-4">
+                <Button variant="outline" size="icon">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </Link>
+              <h1 className="text-3xl font-bold">User Management</h1>
+            </div>
+            
+            <Link href="/admin/users/contacts">
+              <Button className="bg-blue-400 hover:bg-blue-500 text-black">
+                <Phone className="h-4 w-4 mr-2" />
+                Manage Contacts
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold">User Management</h1>
           </div>
 
           <div className="bg-white border-2 border-black rounded-md overflow-hidden">
             <div className="grid grid-cols-12 bg-blue-100 px-4 py-3 border-b border-gray-200">
               <div className="col-span-1 font-medium text-left"></div>
-              <div className="col-span-3 font-medium text-left">Name</div>
-              <div className="col-span-4 font-medium text-left">Email</div>
+              <div className="col-span-2 font-medium text-left">Name</div>
+              <div className="col-span-3 font-medium text-left">Email</div>
+              <div className="col-span-2 font-medium text-left">Location</div>
               <div className="col-span-2 font-medium text-left">Role</div>
               <div className="col-span-2 font-medium text-right">Actions</div>
             </div>
@@ -66,8 +76,18 @@ export default async function AdminUsersPage() {
                       <User className="h-4 w-4 text-gray-500" />
                     </div>
                   </div>
-                  <div className="col-span-3">{profileUser.name || profileUser.full_name || 'User'}</div>
-                  <div className="col-span-4">{profileUser.auth_user?.email || 'No email'}</div>
+                  <div className="col-span-2">{profileUser.name || profileUser.full_name || 'User'}</div>
+                  <div className="col-span-3">{profileUser.auth_user?.email || 'No email'}</div>
+                  <div className="col-span-2">
+                    {profileUser.share_zipcode && profileUser.zip ? (
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 text-green-500 mr-1" />
+                        <span>{profileUser.zip}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-sm">Not shared</span>
+                    )}
+                  </div>
                   <div className="col-span-2 flex items-center">
                     {profileUser.role === 'admin' ? (
                       <div className="flex items-center">
