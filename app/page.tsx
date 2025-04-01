@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Bell, Calendar, ChevronRight } from "lucide-react"
+import { Bell, Calendar, ChevronRight, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/utils/supabase/server"
 import { MobileNav } from "@/components/mobile-nav"
@@ -10,20 +10,32 @@ import { WeatherClient } from "@/components/weather-client"
 export default async function HomePage() {
   let user = null
   let alerts = []
+  let isAdmin = false
 
   try {
     const supabase = await createClient()
     if (supabase) {
       const { data } = await supabase.auth.getUser()
       user = data?.user
-      const { data: alertsData } = await supabase
-        .from('alerts')
-        .select('*')
-        .eq('status', 'active')
-        .eq('created_by', user?.id)
-      alerts = alertsData || []
-
-      console.log(alerts)
+      
+      if (user) {
+        // Get user role to check if admin
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        
+        isAdmin = profileData?.role === 'admin'
+        
+        // Get active alerts created by this user
+        const { data: alertsData } = await supabase
+          .from('alerts')
+          .select('*')
+          .eq('status', 'active')
+          .eq('created_by', user.id)
+        alerts = alertsData || []
+      }
     }
   } catch (error) {
     console.error("Error in HomePage:", error)
@@ -58,7 +70,7 @@ export default async function HomePage() {
     }
   };
 
-  // If user is logged in, show the split screen with Create Alert and Prepare for Future
+  // If user is logged in, show the main dashboard
   if (user) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -101,17 +113,26 @@ export default async function HomePage() {
 
             {/* Split screen container */}
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
-              {/* Left panel - Create an alert */}
+              {/* Left panel - Alert Information */}
               <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-blue-200 flex items-center justify-center mb-4">
-                    <Bell className="h-8 w-8 text-red-500 flex-shrink-0" />
+                    <ShieldAlert className="h-8 w-8 text-red-500 flex-shrink-0" />
                   </div>
-                  <h2 className="text-2xl font-medium">Create Alert</h2>
-                  <p className="text-muted-foreground mt-2">Set up notifications for important events</p>
-                  <Button asChild className="bg-blue-300 hover:bg-blue-400 text-black mt-6 transform transition-transform hover:translate-x-1 hover:translate-y-1">
-                    <Link href="/create-alert">Create Alert</Link>
-                  </Button>
+                  <h2 className="text-2xl font-medium">Alert System</h2>
+                  <p className="text-muted-foreground mt-2">
+                    Alerts can only be created by administrators
+                  </p>
+                  {isAdmin && (
+                    <Button asChild className="bg-blue-300 hover:bg-blue-400 text-black mt-6 transform transition-transform hover:translate-x-1 hover:translate-y-1">
+                      <Link href="/admin/alerts/create">Create Alert</Link>
+                    </Button>
+                  )}
+                  {!isAdmin && (
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Contact an administrator if you need to create an alert
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -130,7 +151,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <p className="text-center text-muted-foreground mb-8"><Link href="/faq">how does this work?</Link></p>
+            {!user &&<p className="text-center text-muted-foreground mb-8"><Link href="/faq">how does this work?</Link></p>}
           </div>
         </main>
 
@@ -158,18 +179,18 @@ export default async function HomePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="bg-blue-100 border-2 border-black p-8 mb-6">
+          <div className="">
             <h2 className="text-2xl font-medium mb-4">welcome to amanos</h2>
-            <p className="text-muted-foreground mb-6">emergency peace of mind, at your fingertips.</p>
-            <Button asChild className="bg-blue-400 hover:bg-blue-500 text-black transform transition-transform hover:translate-x-1 hover:translate-y-1">
+            <p className="text-muted-foreground mb-6">emergency management, at your fingertips.</p>
+            <Button asChild className="rounded-none bg-blue-400 hover:bg-blue-500 text-black transform transition-transform hover:translate-x-1 hover:translate-y-1">
               <Link href="/sign-up">Get Started</Link>
             </Button>
           </div>
           
           {/* Weather display */}
-          <div className="mt-6">
+          {user &&<div className="mt-6">
             <WeatherClient />
-          </div>
+          </div>}
         </div>
       </main>
 

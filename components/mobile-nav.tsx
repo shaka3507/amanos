@@ -2,11 +2,38 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Menu, X, User } from "lucide-react"
+import { Menu, X, User, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { createClient } from "@/utils/supabase/client"
 
 export function MobileNav({ user }: { user: any }) {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    // Check if user has admin role
+    const checkAdminRole = async () => {
+      if (user?.id) {
+        try {
+          const supabase = createClient()
+          if (supabase) {
+            const { data } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .single()
+            
+            setIsAdmin(data?.role === 'admin')
+          }
+        } catch (error) {
+          console.error("Error checking admin role:", error)
+        }
+      }
+    }
+    
+    checkAdminRole()
+  }, [user])
 
   return (
     <div className="md:hidden">
@@ -55,16 +82,16 @@ export function MobileNav({ user }: { user: any }) {
               FAQ
             </Link>
             
-            <form action="/api/auth/signout" method="post" className="w-full">
-              <Button 
-                variant="ghost" 
-                size="lg" 
-                className="w-full text-lg font-medium hover:text-red-500 transition-colors"
-                >
-                sign out 
-                - {user && user.email}
-              </Button>
-            </form>
+            {isAdmin && (
+              <Link 
+                href="/admin" 
+                className="text-lg font-medium hover:text-red-500 transition-colors w-full text-center flex items-center justify-center"
+                onClick={() => setIsOpen(false)}
+              >
+                <Shield className="h-4 w-4 mr-1" />
+                Admin
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -5,17 +5,40 @@ import { useRouter, usePathname } from "next/navigation"
 import { createClient } from "@/utils/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
-import { LogOut, User, Grid, Settings } from "lucide-react"
+import { LogOut, User, Grid, Settings, Shield } from "lucide-react"
 
 export function DashboardNav({ user: initialUser }: { user: any }) {
   const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState(initialUser)
   const [isClient, setIsClient] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
     setUser(initialUser)
+    
+    // Check if user has admin role
+    const checkAdminRole = async () => {
+      if (initialUser?.id) {
+        try {
+          const supabase = createClient()
+          if (supabase) {
+            const { data } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', initialUser.id)
+              .single()
+            
+            setIsAdmin(data?.role === 'admin')
+          }
+        } catch (error) {
+          console.error("Error checking admin role:", error)
+        }
+      }
+    }
+    
+    checkAdminRole()
   }, [initialUser])
 
   const handleSignOut = async () => {
@@ -52,6 +75,11 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
     { href: "/faq", label: "FAQ" },
   ]
 
+  // Add the admin item if user is an admin
+  if (isAdmin) {
+    navItems.push({ href: "/admin", label: "Admin", icon: Shield })
+  }
+
   return (
     <header className="border-b py-4 px-8">
     
@@ -64,7 +92,7 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
           <div className="flex-1 flex justify-end items-center space-x-6">
             <nav className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
                 return (
                   <Link
                     key={item.href}
@@ -73,6 +101,7 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
                       isActive ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
+                    {item.icon && <item.icon className="h-4 w-4 mr-1" />}
                     <span>{item.label}</span>
                   </Link>
                 )
@@ -81,19 +110,18 @@ export function DashboardNav({ user: initialUser }: { user: any }) {
             
             {user && user.email && (
               <div className="text-sm text-muted-foreground hidden md:block">
-
                 {user.email}
               </div>
             )}
 
-            <Button
+            {user && <Button
               onClick={handleSignOut}
               variant="ghost"
               size="sm"
               className="text-muted-foreground hover:text-foreground"
             >
               Sign Out
-            </Button>
+            </Button>}
           </div>
         </div>
       </div>

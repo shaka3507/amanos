@@ -44,4 +44,26 @@ CREATE INDEX IF NOT EXISTS idx_group_alert_recipients_user
 ON group_alert_recipients(user_id);
 
 CREATE INDEX IF NOT EXISTS idx_group_alert_recipients_contact 
-ON group_alert_recipients(emergency_contact_id); 
+ON group_alert_recipients(emergency_contact_id);
+
+-- 4. Add role column to profiles table for role-based access control
+ALTER TABLE profiles
+ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'member';
+
+-- Create an index for better query performance when checking roles
+CREATE INDEX IF NOT EXISTS idx_profiles_role
+ON profiles(role);
+
+-- Update any existing admin users if needed
+-- Example: UPDATE profiles SET role = 'admin' WHERE id = 'specific-user-id';
+
+-- 5. Create a function to check if a user has a specific role
+CREATE OR REPLACE FUNCTION has_role(user_id UUID, required_role TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE
+  user_role TEXT;
+BEGIN
+  SELECT role INTO user_role FROM profiles WHERE id = user_id;
+  RETURN user_role = required_role;
+END;
+$$ LANGUAGE plpgsql; 

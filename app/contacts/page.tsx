@@ -81,8 +81,8 @@ export default async function ContactsPage() {
             </Card>
 
             {/* Right column - Contacts List */}
-            <Card className="bg-green-300 border-2 border-black shadow-lg">
-              <CardHeader>
+            <Card className="border-2 border-black shadow-lg">
+              <CardHeader className="bg-green-300">
                 <div className="flex items-center gap-3">
                   <CardTitle className="text-black">Contacts</CardTitle>
                 </div>

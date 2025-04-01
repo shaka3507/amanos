@@ -1,14 +1,16 @@
 import Link from "next/link"
-import { ArrowLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ChevronRight, Info } from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { MobileNav } from "@/components/mobile-nav"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default async function AlertsIndexPage() {
   let user = null
   let alerts = []
+  let isAdmin = false
 
   try {
     const supabase = await createClient()
@@ -18,6 +20,15 @@ export default async function AlertsIndexPage() {
     if (!user) {
       redirect("/sign-in")
     }
+
+    // Check if user is admin
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    
+    isAdmin = profileData?.role === 'admin'
 
     // Get all alerts the user has access to via group membership
     const { data: memberGroups } = await supabase
@@ -76,7 +87,7 @@ export default async function AlertsIndexPage() {
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
-          <MobileNav />
+          <MobileNav user={user} />
           <div className="mr-4 hidden md:flex">
             <DashboardNav user={user} />
           </div>
@@ -84,17 +95,32 @@ export default async function AlertsIndexPage() {
       </header>
 
       <main className="flex-1 container max-w-5xl py-8 px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-medium">All Alerts</h1>
-          <Button asChild className="bg-blue-300 hover:bg-blue-400 text-black transform transition-transform hover:translate-x-1 hover:translate-y-1">
-            <Link href="/create-alert">Create New Alert</Link>
-          </Button>
+          {isAdmin && (
+            <Button asChild className="bg-blue-300 hover:bg-blue-400 text-black transform transition-transform hover:translate-x-1 hover:translate-y-1">
+              <Link href="/admin/alerts/create">Create New Alert</Link>
+            </Button>
+          )}
         </div>
+        
+        {!isAdmin && (
+          <Alert className="mb-6 bg-blue-50 border border-blue-200">
+            <Info className="h-4 w-4 mr-2" />
+            <AlertDescription>
+              Alerts can only be created by administrators. Contact an admin if you need to create an alert.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {alerts.length === 0 ? (
           <div className="bg-[rgb(255,100,92,0.2)] border-2 border-black p-8 text-center">
             <p className="text-lg mb-4">You don't have any alerts yet.</p>
-            <p className="text-muted-foreground">Create an alert to notify others about important events.</p>
+            <p className="text-muted-foreground">
+              {isAdmin 
+                ? "Create an alert to notify others about important events." 
+                : "You will see alerts here when you are added to alert groups."}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

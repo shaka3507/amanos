@@ -121,10 +121,10 @@ export default async function PreparePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
-                      <Badge variant={isCompleted ? "default" : "secondary"} className="bg-red-500">
+                      <Badge variant={isCompleted ? "default" : "secondary"} className={isCompleted ? "bg-green-500" : "bg-red-500"}>
                         {isCompleted ? "Completed" : "Not Started"}
                       </Badge>
-                      <Button asChild className="bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 border-none rounded-none">
+                      <Button asChild className={isCompleted ? "bg-green-600 hover:bg-green-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 border-none rounded-none" : "bg-red-600 hover:bg-red-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 border-none rounded-none"}>
                         <Link href={`/prepare/${module.id}`}>
                           {isCompleted ? "Review" : "Start"}
                         </Link>

@@ -79,7 +79,7 @@ export function SignInForm() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <Button type="submit" className="w-full bg-blue-400 hover:bg-blue-500 text-black" disabled={loading}>
+      <Button type="submit" className="w-full rounded-none bg-blue-400 hover:bg-blue-500 text-black" disabled={loading}>
         {loading ? "Signing in..." : "Sign In"}
       </Button>
       <div className="text-center text-sm">

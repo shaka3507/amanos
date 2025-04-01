@@ -34,7 +34,7 @@ export function ContactsList({ contacts }: ContactsListProps) {
         contacts.map((contact) => (
           <div 
             key={contact.id} 
-            className="p-4 border-2 border-black flex items-start justify-between hover:bg-blue-50 cursor-pointer"
+            className="shadow-lg p-4 border-2 border-black flex items-start justify-between hover:bg-blue-50 cursor-pointer"
             onClick={() => handleEditContact(contact.id)}
           >
             <div>
