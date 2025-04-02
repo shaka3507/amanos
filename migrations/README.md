@@ -17,6 +17,7 @@ To apply migrations, run them in the Supabase SQL Editor in the following order:
 - `create_migrations_table.sql` - Creates the migrations table to track applied migrations (run this first)
 - `add_share_zipcode_column.sql` - Adds the `share_zipcode` boolean column to the profiles table to support the feature that allows users to control whether their zipcode is visible to administrators
 - `add_address_columns.sql` - Adds address-related columns (`address`, `city`, `state`, `zip`) to the profiles table for storing user location information
+- `create_alert_invitations.sql` - Creates the `alert_invitations` table for tracking invitations sent to non-users for joining alert groups
 
 ## Migration Table Structure
 

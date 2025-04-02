@@ -12,7 +12,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronUp, Send } from "lucide-react";
+import { ChevronDown, ChevronUp, Send, UserPlus } from "lucide-react";
+import MemberUploadModal from "./member-upload-modal";
 
 interface AlertGroupProps {
   alertId: string;
@@ -27,6 +28,7 @@ interface Alert {
   weather_event_type: string;
   created_by: string;
   created_at: string;
+  group_id: string;
 }
 
 interface CrisisItem {
@@ -54,7 +56,14 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
   const [showAllItems, setShowAllItems] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showWellnessStatus, setShowWellnessStatus] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const supabase = createClient();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Function to check if supabase is available
   const getSupabase = () => {
@@ -144,6 +153,7 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
 
         if (alertData) {
           setAlert(alertData);
+          setGroupId(alertData.group_id);
           setIsAdmin(alertData.created_by === userId);
         }
 
@@ -431,186 +441,192 @@ export function AlertGroup({ alertId, userId }: AlertGroupProps) {
     }
   };
 
+  // Add this function to open the upload modal
+  const handleOpenUploadModal = () => {
+    setIsUploadModalOpen(true);
+  };
+
+  // Add this function to close the upload modal
+  const handleCloseUploadModal = () => {
+    setIsUploadModalOpen(false);
+  };
+
   return (
-    <>
+    <div className="space-y-8">
       {error && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 m-4 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error! </strong>
-          <span className="block sm:inline">{error}</span>
+        <div className="bg-red-50 text-red-800 p-4 rounded-md text-sm">
+          {error}
         </div>
       )}
-      <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="flex flex-col relative w-full">
+
+      {alert && (
+        <Card className="bg-white border-2 border-black shadow-lg">
+          <CardHeader className="bg-red-100">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-medium">Crisis Control</h1>
-              {alert && alert.created_at && (
-                <div className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
-                  {formatDuration(alert.created_at)}
-                </div>
+              <CardTitle className="text-xl font-medium text-gray-900">
+                {alert.title}
+              </CardTitle>
+              
+              {isAdmin && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1 border-2 border-black"
+                  onClick={handleOpenUploadModal}
+                >
+                  <UserPlus className="h-4 w-4 mr-1" />
+                  Add Members
+                </Button>
               )}
             </div>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1">
-        <div className="container max-w-5xl py-8 px-4">
-          <div className="mb-6 flex">
-            <Button
-              onClick={() => setShowWellnessStatus(!showWellnessStatus)}
-              className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 text-lg rounded-none font-medium transform transition-transform hover:translate-y-1 border-2 border-black shadow-lg"
-            >
-              {!showWellnessStatus ? "Group Wellness Check" : "Messages"}
-            </Button>
-          </div>
-
-          {showWellnessStatus ? (
-            <Card className="border-2 border-black shadow-lg p-8 min-h-[400px]">
-              <div className="flex justify-center items-center h-full">
-                <h2 className="text-2xl font-bold text-center">
-                  Group Wellness Check
-                </h2>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Right column - Messages */}
-              <Card className="bg-[rgb(255,100,92)] border-2 border-black shadow-lg flex flex-col">
-                <CardHeader>
-                  <CardTitle>Messages</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="space-y-4">
-                    <div className="h-[350px] overflow-y-auto space-y-4">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className="bg-white p-4 space-y-2 border-2 border-black relative"
-                        >
-                          <div className="absolute top-2 right-3 text-xs text-muted-foreground">
-                            {formatRelativeTime(message.created_at)}
-                          </div>
-                          <div className="mt-4">{message.content}</div>
-                          <div className="flex gap-2">
-                            {Object.entries(message.reactions).map(
-                              ([reaction, users]) => (
-                                <Button
-                                  key={reaction}
-                                  variant={
-                                    users.includes(userId)
-                                      ? "default"
-                                      : "outline"
-                                  }
-                                  size="sm"
-                                  onClick={() =>
-                                    handleReaction(message.id, reaction)
-                                  }
-                                  className={
-                                    users.includes(userId)
-                                      ? "bg-red-600 hover:bg-red-700 text-white"
-                                      : "hover:bg-red-100"
-                                  }
-                                >
-                                  {reaction} ({users.length})
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        </div>
-                      ))}
+            
+            {alert.description && (
+              <p className="text-gray-700 mt-2">{alert.description}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              {formatDuration(alert.created_at)}
+            </p>
+          </CardHeader>
+          
+          <CardContent className="flex-1">
+            <div className="space-y-4">
+              <div className="h-[350px] overflow-y-auto space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className="bg-white p-4 space-y-2 border-2 border-black relative"
+                  >
+                    <div className="absolute top-2 right-3 text-xs text-muted-foreground">
+                      {formatRelativeTime(message.created_at)}
+                    </div>
+                    <div className="mt-4">{message.content}</div>
+                    <div className="flex gap-2">
+                      {Object.entries(message.reactions).map(
+                        ([reaction, users]) => (
+                          <Button
+                            key={reaction}
+                            variant={
+                              users.includes(userId)
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              handleReaction(message.id, reaction)
+                            }
+                            className={
+                              users.includes(userId)
+                                ? "bg-red-600 hover:bg-red-700 text-white"
+                                : "hover:bg-red-100"
+                            }
+                          >
+                            {reaction} ({users.length})
+                          </Button>
+                        )
+                      )}
                     </div>
                   </div>
-                </CardContent>
-                {isAdmin && (
-                  <CardFooter className="border-t border-black pt-3">
-                    <form
-                      onSubmit={handleSendMessage}
-                      className="w-full flex gap-2"
-                    >
-                      <Input
-                        type="text"
-                        placeholder="Send a notification to the group..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        className="flex-1 border-2 border-black"
-                      />
-                      <Button
-                        type="submit"
-                        className="bg-white hover:bg-gray-100 border-2 border-black text-black"
-                      >
-                        <Send className="h-4 w-4 mr-1" />
-                        Send
-                      </Button>
-                    </form>
-                  </CardFooter>
-                )}
-              </Card>
-              {/* Left column - Items */}
-              <Card className="bg-[rgb(92, 210, 134)] border-2 border-black shadow-lg">
-                <CardHeader>
-                  <CardTitle>Community Offered Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {displayedItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-4 border-2 border-black bg-white"
-                      >
-                        <div>
-                          <div className="font-medium">{item.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {item.description}
-                          </div>
-                          <div className="text-sm mt-1">
-                            Available: {item.quantity - item.claimed_quantity} /{" "}
-                            {item.quantity}
-                          </div>
-                        </div>
-                        {item.claimed_quantity < item.quantity && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleClaimItem(item.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 rounded-none border-none"
-                          >
-                            Claim
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-
-                    {hasMoreItems && (
-                      <Button
-                        variant="outline"
-                        onClick={toggleShowAllItems}
-                        className="w-full mt-2 flex items-center justify-center bg-white hover:bg-gray-100"
-                      >
-                        {showAllItems ? (
-                          <>
-                            <span className="mr-2">Show Less</span>
-                            <ChevronUp className="h-4 w-4" />
-                          </>
-                        ) : (
-                          <>
-                            <span className="mr-2">
-                              Show {items.length - 3} More
-                            </span>
-                            <ChevronDown className="h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
             </div>
+          </CardContent>
+          {isAdmin && (
+            <CardFooter className="border-t border-black pt-3">
+              <form
+                onSubmit={handleSendMessage}
+                className="w-full flex gap-2"
+              >
+                <Input
+                  type="text"
+                  placeholder="Send a notification to the group..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  className="flex-1 border-2 border-black"
+                />
+                <Button
+                  type="submit"
+                  className="bg-white hover:bg-gray-100 border-2 border-black text-black"
+                >
+                  <Send className="h-4 w-4 mr-1" />
+                  Send
+                </Button>
+              </form>
+            </CardFooter>
           )}
-        </div>
-      </main>
-    </>
+        </Card>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left column - Items */}
+        <Card className="bg-[rgb(92, 210, 134)] border-2 border-black shadow-lg">
+          <CardHeader>
+            <CardTitle>Community Offered Items</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {displayedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 border-2 border-black bg-white"
+                >
+                  <div>
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {item.description}
+                    </div>
+                    <div className="text-sm mt-1">
+                      Available: {item.quantity - item.claimed_quantity} /{" "}
+                      {item.quantity}
+                    </div>
+                  </div>
+                  {item.claimed_quantity < item.quantity && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleClaimItem(item.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white transform transition-transform hover:translate-x-1 hover:translate-y-1 rounded-none border-none"
+                    >
+                      Claim
+                    </Button>
+                  )}
+                </div>
+              ))}
+
+              {hasMoreItems && (
+                <Button
+                  variant="outline"
+                  onClick={toggleShowAllItems}
+                  className="w-full mt-2 flex items-center justify-center bg-white hover:bg-gray-100"
+                >
+                  {showAllItems ? (
+                    <>
+                      <span className="mr-2">Show Less</span>
+                      <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">
+                        Show {items.length - 3} More
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Only keep the original modal */}
+      {isMounted && alertId && groupId && (
+        <MemberUploadModal
+          isOpen={isUploadModalOpen}
+          onClose={handleCloseUploadModal}
+          alertId={alertId}
+          groupId={groupId}
+        />
+      )}
+    </div>
   );
 }

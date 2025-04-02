@@ -10,6 +10,8 @@ import { DashboardNav } from "@/components/dashboard-nav"
 export default async function AlertPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
   let user = null
+  // Store the alert ID in a variable to ensure it's properly awaited
+  const alertId = params.id
 
   try {
     const { data: userData } = await supabase.auth.getUser()
@@ -23,7 +25,7 @@ export default async function AlertPage({ params }: { params: { id: string } }) 
     const { data: alertData } = await supabase
       .from('alerts')
       .select('group_id, title')
-      .eq('id', params.id)
+      .eq('id', alertId)
       .single()
 
     if (!alertData) {
@@ -64,7 +66,7 @@ export default async function AlertPage({ params }: { params: { id: string } }) 
       </header>
 
       <main className="flex-1 container max-w-5xl py-8 px-4 relative z-0">
-        <AlertGroup alertId={params.id} userId={user.id} />
+        <AlertGroup alertId={alertId} userId={user.id} />
       </main>
 
       <footer className="py-6 px-8 text-sm text-muted-foreground border-t relative z-0">
