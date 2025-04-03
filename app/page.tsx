@@ -115,7 +115,7 @@ export default async function HomePage() {
             <div className="overflow-hidden flex flex-col md:flex-row flex-1 mb-8">
 
               {/* Right panel - Prepare for future */}
-              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 ml-1">
+              <div className="bg-green-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-2 ml-0">
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="h-16 w-16 bg-green-200 flex items-center justify-center mb-4">
                     <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />
@@ -127,6 +127,30 @@ export default async function HomePage() {
                   </Button>
                 </div>
               </div>
+              <div className="bg-blue-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-2">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="h-16 w-16 bg-green-200 flex items-center justify-center mb-4">
+                  <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />
+                </div>
+                <h2 className="text-2xl font-medium">Stub</h2>
+                <p className="text-muted-foreground mt-2">Plan ahead and stay organized</p>
+                <Button asChild className="bg-blue-300 hover:bg-green-400 text-black mt-6 transform transition-transform hover:translate-x-1 hover:translate-y-1">
+                  <Link href="/prepare">Get Started</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="bg-purple-100 border-2 border-black flex-1 flex items-center justify-center p-8 m-2 mr-0">
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="h-16 w-16 bg-purple-200 flex items-center justify-center mb-4">
+                <Calendar className="h-8 w-8 text-red-500 flex-shrink-0" />
+              </div>
+              <h2 className="text-2xl font-medium">Stub</h2>
+              <p className="text-muted-foreground mt-2">Plan ahead and stay organized</p>
+              <Button asChild className="bg-green-300 hover:bg-green-400 text-black mt-6 transform transition-transform hover:translate-x-1 hover:translate-y-1">
+                <Link href="/prepare">Get Started</Link>
+              </Button>
+            </div>
+          </div>
             </div>
 
             {!user &&<p className="text-center text-muted-foreground mb-8"><Link href="/faq">how does this work?</Link></p>}
